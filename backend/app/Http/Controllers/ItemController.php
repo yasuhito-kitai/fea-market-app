@@ -13,8 +13,8 @@ class ItemController extends Controller
         return ItemResource::collection(Item::with('user')->get()->sortByDesc('created_at'));
     }
 
-    public function show(int $id)
+    public function show(int $item_id)
     {
-        return new ItemResource(Item::with(['user','condition','categories'])->findOrFail($id));
+        return new ItemResource(Item::with(['user','condition','categories'])->findOrFail($item_id));
     }
 }
