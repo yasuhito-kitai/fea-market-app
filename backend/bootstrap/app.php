@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,14 +14,19 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // CORS を全体に
         $middleware->append(HandleCors::class);
+
         // SPA(Cookie)向けSanctum
-    $middleware->appendToGroup('api', \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class);
+        $middleware->appendToGroup('api', EnsureFrontendRequestsAreStateful::class);
+
+        // ★ 追加：Fortifyの login/logout は「web」経由なので、web にも適用
+        $middleware->appendToGroup('web', EnsureFrontendRequestsAreStateful::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
 
-    $app->register(App\Providers\FortifyServiceProvider::class);
+$app->register(App\Providers\FortifyServiceProvider::class);
 
-    return $app;
+return $app;
