@@ -22,5 +22,15 @@ class UsersTableSeeder extends Seeder
         'email_verified_at' => '2025-01-01 12:00:00',
         'password' => bcrypt('12345678')
     ]);
+
+            DB::table('users')->insert([
+        'username'=>'test2',
+        'email'=>'test2@mail.com',
+        'zipcode'=>'123-4567',
+        'address'=>'神奈川県川崎市',
+        'building'=>'ハイツなんとか',
+        'email_verified_at' => '2025-01-01 12:00:00',
+        'password' => bcrypt('12345678')
+    ]);
     }
 }

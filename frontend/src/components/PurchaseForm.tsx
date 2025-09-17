@@ -25,7 +25,7 @@ export default function PurchaseForm({ item}: Props) {
   const [payment, setPayment] = useState<string>('クレジットカード');
   const [loading, setLoading] = useState(false);
   const [zipcode, setZipcode] = useState<string | null>(null);
-  const [addressLine, setAddressLine] = useState<string | null>(null);
+  const [fullAddress, setFullAddress] = useState<string | null>(null);
 
   const priceText = useMemo(
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
@@ -46,7 +46,7 @@ export default function PurchaseForm({ item}: Props) {
         const data: PurchaseAddressResponse = await res.json();
     // state 更新
       setZipcode(data.zipcode);
-      setAddressLine(data.address_line);
+      setFullAddress(data.address_line);
     } catch (e) {
       console.error(e);
     }
@@ -66,7 +66,7 @@ export default function PurchaseForm({ item}: Props) {
         `商品ID: ${item.id}\n` +
         `支払い方法: ${payment}\n` +
         `郵便番号: ${zipcode ? `〒${zipcode}` : '(未設定)'}\n` +
-        `住所: ${addressLine ? addressLine : '(未設定)'}`
+        `住所: ${fullAddress ? fullAddress : '(未設定)'}`
       );
 
     } catch (e) {
@@ -109,7 +109,7 @@ export default function PurchaseForm({ item}: Props) {
           {zipcode ? `〒${zipcode} `: '（郵便番号未設定。マイページで登録してください）' }
         </p>
         <p className="text-sm font-semibold mt-1">
-          {addressLine ? addressLine : '（住所未設定。マイページで登録してください）' }
+          {fullAddress ? fullAddress : '（住所未設定。マイページで登録してください）' }
         </p>
       </div>
 

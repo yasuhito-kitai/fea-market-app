@@ -15,7 +15,7 @@ class PurchaseAddressController extends Controller
         $user_id=auth()->id();
         if($user_id===$item->user_id){
             return abort(403, '自分の商品は購入できません');
-
+        }
         //住所情報を取り出してJSON形式で返す
         $user=auth()->user();
         return response()->json([
@@ -25,6 +25,5 @@ class PurchaseAddressController extends Controller
             //２段目表示用
             'address_line'=>trim(($user->address ?? '') . ' ' . ($user->building ?? '')),
         ]);
-        }
     }
 }
