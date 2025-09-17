@@ -23,7 +23,7 @@ class ItemsTableSeeder extends Seeder
        ]);
 
        DB::table('items')->insert([
-        'user_id'=>'1',
+        'user_id'=>'2',
         'condition_id'=>'2',
         'item_name' => 'HDD',
         'price' => '5000',
