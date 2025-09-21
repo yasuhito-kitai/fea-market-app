@@ -101,7 +101,7 @@ export default function PurchaseForm({ item}: Props) {
 
         <div className="flex flex-row justify-between items-center mt-6">
           <p className="text-sm font-semibold">配送先</p>
-          <Link href="/mypage/profile" className="text-blue-700 underline">
+          <Link href={`/purchase/address/${item.id}`} className="text-blue-700 underline">
             変更する
           </Link>
         </div>
