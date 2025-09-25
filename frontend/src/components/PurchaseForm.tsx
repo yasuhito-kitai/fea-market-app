@@ -20,7 +20,7 @@ type Props = {
   item: Item;
 };
 
-export default function PurchaseForm({ item}: Props) {
+export default function PurchaseForm({ item }: Props) {
   // 支払い方法はクレカ／コンビニのみ
   const [payment, setPayment] = useState<string>('クレジットカード');
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,14 @@ export default function PurchaseForm({ item}: Props) {
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
     [item.price]
   );
+  useEffect(() => {
+    const draft = localStorage.getItem("shippingDraft:" + item.id);
+    if (draft) {
+      const parsed = JSON.parse(draft);
+      setZipcode(parsed.zipcode);
+      setFullAddress((parsed.address ?? "") + " " + (parsed.building ?? ""));
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchAddress() {
