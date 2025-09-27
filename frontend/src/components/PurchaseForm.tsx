@@ -31,36 +31,55 @@ export default function PurchaseForm({ item }: Props) {
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
     [item.price]
   );
+ 
   useEffect(() => {
-    const draft = localStorage.getItem("shippingDraft:" + item.id);
-    if (draft) {
-      const parsed = JSON.parse(draft);
-      setZipcode(parsed.zipcode);
-      setFullAddress((parsed.address ?? "") + " " + (parsed.building ?? ""));
+    try {
+      setLoading(true)
+      const draft = localStorage.getItem("shippingDraft:" + item.id);
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        setZipcode(parsed.zipcode);
+        setFullAddress(((parsed.address ?? "") + " " + (parsed.building ?? "")).trim());
+      }
+    } catch(e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
     }
-  }, []);
+  }, [item.id]);
 
   useEffect(() => {
     async function fetchAddress() {
-      try{
+      const draft = localStorage.getItem("shippingDraft:" + item.id);
+      try {
+        setLoading(true)
+        if (draft) return
       const res = await fetch(`${apiBaseUrl}/api/purchase/address/${item.id}`, {
-      credentials: 'include',
+        credentials: 'include',
+        headers: { Accept: "application/json" },
     });
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }
-
-        const data: PurchaseAddressResponse = await res.json();
+      const body = await res.json();
+      const payload = body.data ?? body;
+      const data: PurchaseAddressResponse = payload;
     // state 更新
-      setZipcode(data.zipcode);
-      setFullAddress(data.address_line);
+      if (!zipcode) {
+        setZipcode(data.zipcode);
+      }
+      if (!fullAddress) {
+        setFullAddress(data.address_line);
+      }
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoading(false)
     }
   }
   fetchAddress();
-  },[item.id]);
+  },[item.id, apiBaseUrl]);
 
 
 
