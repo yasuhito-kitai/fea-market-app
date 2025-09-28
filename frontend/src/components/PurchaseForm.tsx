@@ -5,7 +5,6 @@ import { useMemo, useState,useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 type Item = {
@@ -26,6 +25,7 @@ export default function PurchaseForm({ item }: Props) {
   const [loading, setLoading] = useState(false);
   const [zipcode, setZipcode] = useState<string | null>(null);
   const [fullAddress, setFullAddress] = useState<string | null>(null);
+  const [usedDraft, setUsedDraft] = useState<boolean | null>(false);
 
   const priceText = useMemo(
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
@@ -40,20 +40,26 @@ export default function PurchaseForm({ item }: Props) {
         const parsed = JSON.parse(draft);
         setZipcode(parsed.zipcode);
         setFullAddress(((parsed.address ?? "") + " " + (parsed.building ?? "")).trim());
+        setUsedDraft(true);
+        setTimeout(() => {
+          localStorage.removeItem("shippingDraft:" + item.id);
+        }, 0);
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
     }
+
   }, [item.id]);
 
   useEffect(() => {
+    if(usedDraft) return
     async function fetchAddress() {
       const draft = localStorage.getItem("shippingDraft:" + item.id);
       try {
-        setLoading(true)
         if (draft) return
+        setLoading(true)
       const res = await fetch(`${apiBaseUrl}/api/purchase/address/${item.id}`, {
         credentials: 'include',
         headers: { Accept: "application/json" },
@@ -79,7 +85,7 @@ export default function PurchaseForm({ item }: Props) {
     }
   }
   fetchAddress();
-  },[item.id, apiBaseUrl]);
+  },[item.id, apiBaseUrl,usedDraft]);
 
 
 
