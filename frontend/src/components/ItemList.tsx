@@ -10,7 +10,8 @@ type Props = {
   initialItems: Item[];
 };
 
-export default function ItemsList({ initialItems }: Props) {
+export default function ItemsList(props: Props ) {
+  const initialItems = props.initialItems;
   const [items, setItems] = useState<Item[]>(initialItems);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
