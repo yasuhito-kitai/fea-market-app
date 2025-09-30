@@ -1,5 +1,5 @@
 import { Item } from "../types/item";
-import { ItemCard } from "../components/ItemCard"
+import ItemsList  from "../components/ItemsList";
 
 const apiBaseUrl = process.env.API_BASE_URL_SERVER;
 
@@ -15,12 +15,6 @@ async function getItems(): Promise<Item[]> {
 
 export default async function Page() {
   const items = await getItems();
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {items.length === 0
-        ? (<p>商品がありません</p>)
-        : items.map((item) => <ItemCard key={item.id} item={item} />)
-      }
-    </div>
-  );
+  return <ItemsList initialItems={items} />;
+
 }
