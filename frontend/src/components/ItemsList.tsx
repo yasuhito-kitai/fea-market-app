@@ -33,9 +33,16 @@ export default function ItemsList(props: Props ) {
   fetchUser();
   }, []);
 
+  const visibleItems = currentUserId
+  ? items.filter(item => item.user_id !== currentUserId)
+  : items;
+
   return (
-    <div>
-      {/* ここで items を map して ItemCard を並べる */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {visibleItems.length === 0
+        ? (<p>商品がありません</p>)
+        : visibleItems.map((item) => <ItemCard key={item.id} item={item} />)
+      }
     </div>
   );
 }
