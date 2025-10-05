@@ -7,7 +7,8 @@ type Props = {
     item: Item;
 };
 
-export const ItemCard = ({ item }: Props) => {
+export const ItemCard = (props: Props) => {
+    const item = props.item;
     return (
         <Link href={`/items/${item.id}`}>
         <div className="border rounded p-4">

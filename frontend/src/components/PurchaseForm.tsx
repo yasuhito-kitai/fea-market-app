@@ -93,15 +93,36 @@ export default function PurchaseForm({ item }: Props) {
     if (loading) return;
     setLoading(true);
     try {
-      // 動作確認の仮処理
-      alert(
-        `購入（仮）\n` +
-        `商品ID: ${item.id}\n` +
-        `支払い方法: ${payment}\n` +
-        `郵便番号: ${zipcode ? `〒${zipcode}` : '(未設定)'}\n` +
-        `住所: ${fullAddress ? fullAddress : '(未設定)'}`
-      );
+      function getCookie(name: string) {
+      const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    }
+      const xsrf = getCookie('XSRF-TOKEN');
 
+      const res = await fetch(`${apiBaseUrl}/api/purchase`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': "application/json",
+          'Content-Type': "application/json",
+          'X-XSRF-TOKEN': xsrf ?? '',
+        },
+        
+        body: JSON.stringify({
+          item_id:item.id,
+          payment,
+          zipcode,
+          address_line:fullAddress
+        }),
+      });
+      console.log('status:', res.status);
+      if (res.status === 201) {
+        
+        const data=await res.json();
+        alert(data.message);
+      }else{
+        throw new Error("購入に失敗しました")
+      }
     } catch (e) {
       console.error(e);
       alert('購入処理でエラーが発生しました（仮）');
