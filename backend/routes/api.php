@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PurchaseAddressController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\CheckoutController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update']);
@@ -14,6 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('purchase/address/{item_id}',[PurchaseAddressController::class,'show']);
     Route::post('/purchase',[PurchaseController::class,'store']);
+    Route::post('/checkout/create-intent',[CheckoutController::class,'createIntent']);
 });
 Route::get('/items', [ItemController::class, 'index']);
 Route::get('/items/{item_id}',[ItemController::class,'show']);
