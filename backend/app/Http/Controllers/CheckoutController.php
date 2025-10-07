@@ -14,5 +14,14 @@ class CheckoutController extends Controller
         $item_id=$request->item_id;
         $item=Item::findOrFail($item_id);
         $price=$item->price;
+        
+        $params=[
+            'amount' => $price,
+            'currency' => 'jpy',
+            'payment_method_types' => ['card'],
+        ];
+        $paymentIntent=PaymentIntent::create($params);
+        return response()->json(['clientSecret'=>$paymentIntent->client_secret],201);
+        
     }
 }
