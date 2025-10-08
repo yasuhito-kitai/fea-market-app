@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use App\Models\Item;
 
 class CheckoutController extends Controller
 {
@@ -16,7 +17,7 @@ class CheckoutController extends Controller
         $price=$item->price;
         
         $params=[
-            'amount' => $price,
+            'amount' => (int) $price,
             'currency' => 'jpy',
             'payment_method_types' => ['card'],
         ];

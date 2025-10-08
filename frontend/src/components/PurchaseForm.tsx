@@ -5,6 +5,7 @@ import { useMemo, useState,useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 type Item = {
@@ -99,7 +100,31 @@ export default function PurchaseForm({ item }: Props) {
     }
       const xsrf = getCookie('XSRF-TOKEN');
 
-      const res = await fetch(`${apiBaseUrl}/api/purchase`, {
+      // const res = await fetch(`${apiBaseUrl}/api/purchase`, {
+      //   method: 'POST',
+      //   credentials: 'include',
+      //   headers: {
+      //     'Accept': "application/json",
+      //     'Content-Type': "application/json",
+      //     'X-XSRF-TOKEN': xsrf ?? '',
+      //   },
+        
+      //   body: JSON.stringify({
+      //     item_id:item.id,
+      //     payment,
+      //     zipcode,
+      //     address_line:fullAddress
+      //   }),
+      // });
+      // console.log('status:', res.status);
+      // if (res.status === 201) {
+      //   const data=await res.json();
+      //   alert(data.message);
+      // }else{
+      //   throw new Error("購入に失敗しました")
+      // }
+
+      const intentRes = await fetch(`${apiBaseUrl}/api/checkout/create-intent`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -112,17 +137,16 @@ export default function PurchaseForm({ item }: Props) {
           item_id:item.id,
           payment,
           zipcode,
-          address_line:fullAddress
+          address_line:fullAddress ?? '',
         }),
       });
-      console.log('status:', res.status);
-      if (res.status === 201) {
-        
-        const data=await res.json();
-        alert(data.message);
-      }else{
-        throw new Error("購入に失敗しました")
+      if (intentRes.status === 201) {
+        const { clientSecret } = await intentRes.json();
+      } else {
+        console.error('intentRes failed:', intentRes.status);
+        throw new Error("購入に失敗しました");
       }
+
     } catch (e) {
       console.error(e);
       alert('購入処理でエラーが発生しました（仮）');
