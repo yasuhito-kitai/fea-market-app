@@ -1,7 +1,7 @@
 import { Item } from "@/types/item";
 import Image from "next/image";
 import Link from "next/link";
-import { loadStripe } from '@stripe/stripe-js';
+
 
 const apiBaseUrl = process.env.API_BASE_URL_SERVER;
 
@@ -16,7 +16,6 @@ async function getItem(item_id: string): Promise<Item> {
   return data.data;
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 export default async function ItemDetailPage({ params }: { params: { item_id: string } }) {
   const item = await getItem(params.item_id);

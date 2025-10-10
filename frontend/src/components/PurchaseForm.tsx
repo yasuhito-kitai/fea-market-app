@@ -1,7 +1,8 @@
 'use client';
 
 import { PurchaseAddressResponse } from "../types/purchase";
-import { useMemo, useState,useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useStripe, useElements } from '@stripe/react-stripe-js';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -27,11 +28,11 @@ export default function PurchaseForm({ item }: Props) {
   const [zipcode, setZipcode] = useState<string | null>(null);
   const [fullAddress, setFullAddress] = useState<string | null>(null);
   const [usedDraft, setUsedDraft] = useState<boolean | null>(false);
-
   const priceText = useMemo(
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
     [item.price]
   );
+  const [useStripe, setStripe] = useState();
  
   useEffect(() => {
     try {
