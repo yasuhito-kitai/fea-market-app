@@ -5,7 +5,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { CardElement } from "@stripe/react-stripe-js";
+import { useRouter } from 'next/navigation';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -27,13 +28,18 @@ export default function PurchaseForm({ item }: Props) {
   const [loading, setLoading] = useState(false);
   const [zipcode, setZipcode] = useState<string | null>(null);
   const [fullAddress, setFullAddress] = useState<string | null>(null);
-  const [usedDraft, setUsedDraft] = useState<boolean | null>(false);
+  const [usedDraft, setUsedDraft] = useState<boolean>(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  
   const priceText = useMemo(
     () => `¥${new Intl.NumberFormat('ja-JP').format(item.price)}`,
     [item.price]
   );
-  const [useStripe, setStripe] = useState();
- 
+  const stripe = useStripe();
+  const elements = useElements();
+  const router = useRouter();
+  const ready = !!(clientSecret && stripe && elements);
+
   useEffect(() => {
     try {
       setLoading(true)
@@ -48,9 +54,9 @@ export default function PurchaseForm({ item }: Props) {
         }, 0);
       }
     } catch (e) {
-      console.error(e)
+      console.error(e);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
 
   }, [item.id]);
@@ -94,36 +100,13 @@ export default function PurchaseForm({ item }: Props) {
   const handlePurchase = async () => {
     if (loading) return;
     setLoading(true);
+
     try {
       function getCookie(name: string) {
       const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
       return match ? decodeURIComponent(match[1]) : null;
     }
       const xsrf = getCookie('XSRF-TOKEN');
-
-      // const res = await fetch(`${apiBaseUrl}/api/purchase`, {
-      //   method: 'POST',
-      //   credentials: 'include',
-      //   headers: {
-      //     'Accept': "application/json",
-      //     'Content-Type': "application/json",
-      //     'X-XSRF-TOKEN': xsrf ?? '',
-      //   },
-        
-      //   body: JSON.stringify({
-      //     item_id:item.id,
-      //     payment,
-      //     zipcode,
-      //     address_line:fullAddress
-      //   }),
-      // });
-      // console.log('status:', res.status);
-      // if (res.status === 201) {
-      //   const data=await res.json();
-      //   alert(data.message);
-      // }else{
-      //   throw new Error("購入に失敗しました")
-      // }
 
       const intentRes = await fetch(`${apiBaseUrl}/api/checkout/create-intent`, {
         method: 'POST',
@@ -133,7 +116,7 @@ export default function PurchaseForm({ item }: Props) {
           'Content-Type': "application/json",
           'X-XSRF-TOKEN': xsrf ?? '',
         },
-        
+
         body: JSON.stringify({
           item_id:item.id,
           payment,
@@ -141,8 +124,11 @@ export default function PurchaseForm({ item }: Props) {
           address_line:fullAddress ?? '',
         }),
       });
+
       if (intentRes.status === 201) {
         const { clientSecret } = await intentRes.json();
+        setClientSecret(clientSecret);
+        // router.push(`/purchase/complete?item_id=${item.id}&amount=${item.price}`);
       } else {
         console.error('intentRes failed:', intentRes.status);
         throw new Error("購入に失敗しました");
@@ -207,6 +193,8 @@ export default function PurchaseForm({ item }: Props) {
           </tbody>
         </table>
 
+        {ready && <CardElement />}
+        
         <button
           onClick={handlePurchase}
           disabled={loading}
