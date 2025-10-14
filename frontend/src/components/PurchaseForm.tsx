@@ -99,7 +99,24 @@ export default function PurchaseForm({ item }: Props) {
 
   const handlePurchase = async () => {
     if (loading) return;
+    if (payment !== 'クレジットカード') return;
+    if (!zipcode || !fullAddress) return;
     setLoading(true);
+
+    if (clientSecret && stripe && elements) {
+    const card = elements.getElement(CardElement);
+    if (!card) { console.warn('CardElement not mounted'); setLoading(false); return; }
+
+    const result = await stripe.confirmCardPayment(clientSecret, { payment_method: { card } });
+
+    if (result.error) { alert(result.error.message ?? '決済に失敗しました'); setLoading(false); return; }
+    if (result.paymentIntent?.status === 'succeeded') {
+    router.push(`/purchase/complete?item_id=${item.id}&amount=${item.price}`);
+    return;
+  }
+  setLoading(false);
+  return;
+}
 
     try {
       function getCookie(name: string) {
@@ -118,27 +135,26 @@ export default function PurchaseForm({ item }: Props) {
         },
 
         body: JSON.stringify({
-          item_id:item.id,
+          item_id: item.id,
           payment,
           zipcode,
-          address_line:fullAddress ?? '',
+          address_line: fullAddress ?? '',
         }),
       });
 
       if (intentRes.status === 201) {
         const { clientSecret } = await intentRes.json();
         setClientSecret(clientSecret);
-        // router.push(`/purchase/complete?item_id=${item.id}&amount=${item.price}`);
+        setLoading(false);
+        return;
       } else {
-        console.error('intentRes failed:', intentRes.status);
+        const errJson = await intentRes.json().catch(() => null);
+        console.error('create-intent failed:', intentRes.status, errJson);
         throw new Error("購入に失敗しました");
       }
-
     } catch (e) {
       console.error(e);
       alert('購入処理でエラーが発生しました（仮）');
-    } finally {
-      setLoading(false);
     }
   };
 
