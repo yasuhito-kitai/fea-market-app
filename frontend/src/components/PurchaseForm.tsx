@@ -111,7 +111,7 @@ export default function PurchaseForm({ item }: Props) {
 
     if (result.error) { alert(result.error.message ?? '決済に失敗しました'); setLoading(false); return; }
     if (result.paymentIntent?.status === 'succeeded') {
-    router.push(`/purchase/complete?item_id=${item.id}&amount=${item.price}`);
+    router.push(`/purchase/complete?item_id=${item.id}&name=${encodeURIComponent(item.name)}&amount=${item.price}`);
     return;
   }
   setLoading(false);
