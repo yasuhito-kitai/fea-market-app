@@ -68,8 +68,8 @@ export default function Header({ logoOnly = false }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+    <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur h-[65px]">
+      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 h-full">
         <Link href="/" className="shrink-0 font-bold text-xl tracking-wide">CompanyLogo</Link>
 
         {!logoOnly && (
