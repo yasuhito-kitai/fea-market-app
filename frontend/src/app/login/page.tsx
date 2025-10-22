@@ -83,7 +83,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+    <div className="w-full max-w-md min-w-[320px] mx-auto mt-10 p-6 bg-white">
       <h1 className="text-2xl font-bold mb-6">ログイン</h1>
       {error && <p className="mb-4 text-red-500">{error}</p>}
       <form onSubmit={handleLogin} className="space-y-4">

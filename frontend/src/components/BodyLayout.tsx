@@ -9,7 +9,7 @@ export default function BodyLayout({ children }: { children: React.ReactNode }) 
     return (
     <>
       <Header logoOnly={logoOnly} />
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="mw-full px-4 py-6">{children}</main>
     </>
   );
 }

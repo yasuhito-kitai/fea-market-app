@@ -110,9 +110,36 @@ export default function PurchaseForm({ item }: Props) {
     const result = await stripe.confirmCardPayment(clientSecret, { payment_method: { card } });
 
     if (result.error) { alert(result.error.message ?? '決済に失敗しました'); setLoading(false); return; }
-    if (result.paymentIntent?.status === 'succeeded') {
-    router.push(`/purchase/complete?item_id=${item.id}&name=${encodeURIComponent(item.name)}&amount=${item.price}`);
-    return;
+      if (result.paymentIntent?.status === 'succeeded') {
+        function getCookie(name: string) {
+      const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    }
+      const xsrf = getCookie('XSRF-TOKEN');
+      const saveRes = await fetch(`${apiBaseUrl}/api/purchase`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': "application/json",
+          'Content-Type': "application/json",
+          'X-XSRF-TOKEN': xsrf ?? '',
+        },
+
+        body: JSON.stringify({
+          item_id: item.id,
+          payment,
+          zipcode,
+          address_line: fullAddress ?? '',
+        }),
+      });
+      if (saveRes.status === 201) {
+        router.push(`/purchase/complete?item_id=${item.id}&name=${encodeURIComponent(item.name)}&amount=${item.price}`);
+        return;
+      } else {
+        console.error('saveRes failed:', saveRes.status);
+        alert('購入情報の保存に失敗しました');
+        return;
+      }
   }
   setLoading(false);
   return;

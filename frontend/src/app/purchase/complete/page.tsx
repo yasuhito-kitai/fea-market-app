@@ -12,8 +12,8 @@ export default function PurchaseCompletePage() {
     const amountJa = amountNum !== null ? new Intl.NumberFormat('ja-JP').format(amountNum) : '-';
 
     return (
-        <main className="flex-1 flex items-center justify-center bg-gray-50 overflow-hidden">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md text-center">
+        <main className="flex-1 flex items-center justify-center ">
+      <div className="p-8 w-full max-w-md text-center">
             <h1 className="text-2xl font-bold text-green-600 mb-4">購入が完了しました</h1>
                 <h2 className="text-lg font-semibold mb-6 text-gray-700">注文情報</h2>
                 <div className="text-left space-y-3 mb-8 px-22">
